@@ -6,10 +6,13 @@
 #include <vector>
 #include <thread>
 using namespace std;
-NoReturn API_Rend(vector<vector<RGBColor>> rgbmap) {
+
+enum ORIGINPOSITION {LEFTUP = -1, LEFTDOWN = 1};
+
+NoReturn API_Rend(vector<vector<RGBColor>> rgbmap, int direct) {
 	RGBReturnValue result[rgbmap.size() + 1][rgbmap[0].size() + 1] = {0};
-	for (int x = 0; x < int(rgbmap.size()); x++) {
-		for (int y = 0; y < int(rgbmap[x].size()); y++) {
+	for (int x = 0; x < int(rgbmap[x].size()); x++) {
+		for (int y = 0; y < int(rgbmap.size()); y++) {
 			result[x][y] = RGB(rgbmap[x][y]);
 		}
 	}
@@ -20,7 +23,7 @@ NoReturn API_Rend(vector<vector<RGBColor>> rgbmap) {
 	BITMAPINFOHEADER bmpinfoheader = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	bmpinfoheader.biSize = sizeof(BITMAPINFOHEADER);
 	bmpinfoheader.biWidth = rgbmap.size();
-	bmpinfoheader.biHeight = rgbmap[0].size();
+	bmpinfoheader.biHeight = rgbmap[0].size() * direct;
 	bmpinfoheader.biPlanes = 1;
 	bmpinfoheader.biBitCount = 32;
 	bmpinfoheader.biCompression = BI_RGB;
@@ -49,8 +52,8 @@ NoReturn API_Rend(vector<vector<RGBColor>> rgbmap) {
 	return;
 }
 
-NoReturn RendMap(vector<vector<RGBColor>> rgbmap) {
-	thread api(API_Rend, rgbmap);
+NoReturn RendMap(vector<vector<RGBColor>> rgbmap, int direct = LEFTUP) {
+	thread api(API_Rend, rgbmap, direct);
 	api.detach();
 	return;
 }
